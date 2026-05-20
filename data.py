@@ -3,6 +3,7 @@
 import cv2 as cv 
 import sys 
 import random
+import numpy as np 
 
 def writeImage():
     img = cv.imread("./image.png") #read image from path
@@ -34,6 +35,30 @@ def readImage():
     cv.imshow('img', img)
     cv.waitKey(0)
     writeImage()
+ 
+def webCam():
+    cap = cv.VideoCapture(0)
 
+    while 1:
+        ret, frame = cap.read() # two return values
+        width = int(cap.get(3))
+        height = int(cap.get(4))
+
+        #cv.imshow('frame', frame)
+
+        image = np.zeros(frame.shape, np.uint8)
+        small_frame = cv.resize(frame, (0,0), fx = 0.5, fy = 0.5)
+        image[:height // 2, :width//2] = cv.rotate(small_frame, cv2.cv2.ROTATE_180)
+        image[height // 2:, :width//2] = small_frame
+        image[height // 2:, width//2:] = small_frame
+        image[:height // 2, width//2:] = small_frame
+
+        cv.imshow('frame', image)
+        if cv.waitKey(1) == ord('q'):
+            break
+    cap.release()
+    cv.destroyAllWindows()
+
+    
 if __name__ == '__main__':
-    readImage()
+    webCam()
